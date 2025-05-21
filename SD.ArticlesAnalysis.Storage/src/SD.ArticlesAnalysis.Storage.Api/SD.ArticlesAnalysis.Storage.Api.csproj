@@ -10,5 +10,5 @@
       <ProjectReference Include="..\SD.ArticlesAnalysis.Storage.Domain\SD.ArticlesAnalysis.Storage.Domain.csproj" />
       <ProjectReference Include="..\SD.ArticlesAnalysis.Storage.Infrastructure\SD.ArticlesAnalysis.Storage.Infrastructure.csproj" />
     </ItemGroup>
-
+    
 </Project>

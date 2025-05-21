@@ -1,26 +1,24 @@
+using System.Net;
+
 namespace SD.ArticlesAnalysis.Storage.Api;
 
-public class Program
+public sealed class Program
 {
-    public static void Main(string[] args)
+    public static async Task Main()
     {
-        var builder = WebApplication.CreateBuilder(args);
+        var hostBuilder = Host.CreateDefaultBuilder()
+            .ConfigureWebHostDefaults(webBuilder => webBuilder.UseStartup<Startup>())
+            .ConfigureWebHost(webHostBuilder =>
+            {
+                webHostBuilder.ConfigureKestrel((context, kestrelOptions) =>
+                    {
+                        kestrelOptions.Listen(IPAddress.Any, 7070);
+                    }
+                );
+            });
 
-        // Add services to the container.
-
-        builder.Services.AddControllers();
-
-        var app = builder.Build();
-
-        // Configure the HTTP request pipeline.
-
-        app.UseHttpsRedirection();
-
-        app.UseAuthorization();
-
-
-        app.MapControllers();
-
-        app.Run();
+        await hostBuilder
+            .Build()
+            .RunAsync();
     }
 }
