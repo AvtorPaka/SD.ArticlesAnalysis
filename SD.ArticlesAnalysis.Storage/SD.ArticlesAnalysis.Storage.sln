@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SD.ArticlesAnalysis.Storage.Api", "src\SD.ArticlesAnalysis.Storage.Api\SD.ArticlesAnalysis.Storage.Api.csproj", "{8E731448-181D-4D2A-ACF0-B64DF50115DA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SD.ArticlesAnalysis.Storage.Domain", "src\SD.ArticlesAnalysis.Storage.Domain\SD.ArticlesAnalysis.Storage.Domain.csproj", "{C475D9BA-3834-4710-91C6-393908DBD5E7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SD.ArticlesAnalysis.Storage.Infrastructure", "src\SD.ArticlesAnalysis.Storage.Infrastructure\SD.ArticlesAnalysis.Storage.Infrastructure.csproj", "{10A6F2FC-A9AB-4754-A9AC-592FFFE13373}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8E731448-181D-4D2A-ACF0-B64DF50115DA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8E731448-181D-4D2A-ACF0-B64DF50115DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8E731448-181D-4D2A-ACF0-B64DF50115DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8E731448-181D-4D2A-ACF0-B64DF50115DA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C475D9BA-3834-4710-91C6-393908DBD5E7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C475D9BA-3834-4710-91C6-393908DBD5E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C475D9BA-3834-4710-91C6-393908DBD5E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C475D9BA-3834-4710-91C6-393908DBD5E7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{10A6F2FC-A9AB-4754-A9AC-592FFFE13373}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{10A6F2FC-A9AB-4754-A9AC-592FFFE13373}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{10A6F2FC-A9AB-4754-A9AC-592FFFE13373}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{10A6F2FC-A9AB-4754-A9AC-592FFFE13373}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
