@@ -12,7 +12,10 @@ public class ArticleMetaModelValidator: AbstractValidator<ArticleMetaModel>
             .NotNull()
             .NotEmpty()
             .Matches(@"\.txt$", RegexOptions.IgnoreCase)
-            .WithMessage("Article must have .txt extension and be compatible with .txt format");
+            .WithMessage("Article must have .txt extension and be compatible with .txt format.");
+        RuleFor(m => m.Name)
+            .MaximumLength(256)
+            .WithMessage("Article name length must be less than 256 characters.");
         RuleFor(m => m.Hash).NotNull().NotEmpty();
         RuleFor(m => m.Location).NotNull().NotEmpty();
     }

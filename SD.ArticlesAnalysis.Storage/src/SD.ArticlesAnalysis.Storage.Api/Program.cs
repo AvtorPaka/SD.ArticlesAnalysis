@@ -1,4 +1,5 @@
 using System.Net;
+using SD.ArticlesAnalysis.Storage.Infrastructure.DependencyInjection.Extensions;
 
 namespace SD.ArticlesAnalysis.Storage.Api;
 
@@ -19,6 +20,7 @@ public sealed class Program
 
         await hostBuilder
             .Build()
+            .MigrateUp()
             .RunAsync();
     }
 }

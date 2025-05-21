@@ -1,8 +1,10 @@
 using System.Text.Json;
+using FluentValidation;
 using SD.ArticlesAnalysis.Storage.Api.Extensions;
 using SD.ArticlesAnalysis.Storage.Api.Filters;
 using SD.ArticlesAnalysis.Storage.Api.MiddleWare;
 using SD.ArticlesAnalysis.Storage.Domain.DependencyInjection.Extensions;
+using SD.ArticlesAnalysis.Storage.Infrastructure.DependencyInjection.Extensions;
 
 namespace SD.ArticlesAnalysis.Storage.Api;
 
@@ -21,6 +23,11 @@ internal class Startup
     {
         services
             .AddGlobalFilters()
+            .AddDalInfrastructure(
+                configuration: _configuration,
+                isDevelopment: _hostEnvironment.IsDevelopment()
+            )
+            .AddDalRepositories()
             .AddDomainServices()
             .AddControllers()
             .AddJsonOptions(options =>
@@ -35,6 +42,8 @@ internal class Startup
 
     public void Configure(IApplicationBuilder app)
     {
+        ValidatorOptions.Global.LanguageManager.Enabled = false;
+        app.UseMiddleware<TracingMiddleware>();
         app.UsePathBase("/api/storage");
         app.UseRouting();
 
