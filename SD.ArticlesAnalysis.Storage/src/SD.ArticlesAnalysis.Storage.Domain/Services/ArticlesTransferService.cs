@@ -65,6 +65,16 @@ public class ArticlesTransferService : IArticlesTransferService
         }
         else
         {
+            var validateArticleMetaModel = new ArticleMetaModel(
+                Id: -1,
+                Name: articleName,
+                Hash: "",
+                Location: ""
+            );
+
+            var validator = new ArticleMetaModelValidator();
+            await validator.ValidateAndThrowAsync(validateArticleMetaModel, cancellationToken);
+
             string articleUniqueName = $"{articleContentHash}_{articleName}";
 
             string articleLocation = await _articlesDataRepository.UploadArticleFile(
@@ -72,28 +82,23 @@ public class ArticlesTransferService : IArticlesTransferService
                 articleDataStream: articleDataStream,
                 cancellationToken: cancellationToken
             );
-
-            var stepArticleMetaModel = new ArticleMetaModel(
-                Id: -1,
-                Name: articleName,
-                Hash: articleContentHash,
-                Location: articleLocation
-            );
-
-            var validator = new ArticleMetaModelValidator();
-            await validator.ValidateAndThrowAsync(stepArticleMetaModel, cancellationToken);
-
+            
             long createdMetaId = await _articlesMetaRepository.Add(
                 entity: new ArticleMetaEntity
                 {
-                    Hash = stepArticleMetaModel.Hash,
-                    Location = stepArticleMetaModel.Location,
-                    Name = stepArticleMetaModel.Name
+                    Hash = articleContentHash,
+                    Location = articleLocation,
+                    Name = articleName
                 },
                 cancellationToken: cancellationToken
             );
 
-            articleMetaModel = stepArticleMetaModel with { Id = createdMetaId };
+            articleMetaModel = new ArticleMetaModel(
+                Id: createdMetaId,
+                Name: articleName,
+                Hash: articleContentHash,
+                Location: articleLocation
+            );
         }
 
         transaction.Complete();

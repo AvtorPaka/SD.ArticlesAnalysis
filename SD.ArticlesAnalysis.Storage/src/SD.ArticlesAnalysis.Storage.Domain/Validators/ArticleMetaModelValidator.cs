@@ -16,7 +16,5 @@ public class ArticleMetaModelValidator: AbstractValidator<ArticleMetaModel>
         RuleFor(m => m.Name)
             .MaximumLength(256)
             .WithMessage("Article name length must be less than 256 characters.");
-        RuleFor(m => m.Hash).NotNull().NotEmpty();
-        RuleFor(m => m.Location).NotNull().NotEmpty();
     }
 }

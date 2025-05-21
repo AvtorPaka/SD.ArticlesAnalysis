@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc.Filters;
 using SD.ArticlesAnalysis.Storage.Api.Extensions;
 using SD.ArticlesAnalysis.Storage.Api.Filters.Utils;
+using SD.ArticlesAnalysis.Storage.Domain.Exceptions.Domain;
 using SD.ArticlesAnalysis.Storage.Domain.Exceptions.Domain.Articles;
 
 namespace SD.ArticlesAnalysis.Storage.Api.Filters;
@@ -20,6 +21,16 @@ public class ExceptionFilter : IExceptionFilter
 
         switch (context.Exception)
         {
+            case BadRequestException exception:
+                _logger.LogDomainBadRequestError(
+                    callId: callId,
+                    curTime: DateTime.UtcNow,
+                    violations: exception.ToString()
+                );
+                
+                ErrorRequestHandler.HandleBadRequestError(context, exception);
+                break;
+
             case ArticleDataNotFoundException exception:
                 _logger.LogArticleDataNotFound(
                     callId: callId,
