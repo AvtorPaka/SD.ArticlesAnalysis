@@ -7,7 +7,7 @@ public class ArticleDataNotFoundException: DomainException
     public long InvalidId { get; init; }
     public string? InvalidPath { get; init; }
     
-    protected ArticleDataNotFoundException(string? message, long invalidId, string? invalidPath, EntityNotFoundException? innerException) : base(message, innerException)
+    public ArticleDataNotFoundException(string? message, long invalidId, string? invalidPath, DataFileNotFoundException? innerException) : base(message, innerException)
     {
         InvalidId = invalidId;
         InvalidPath = invalidPath;

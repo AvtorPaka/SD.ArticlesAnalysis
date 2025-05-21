@@ -6,7 +6,7 @@ public class ArticleNotFoundException: DomainException
 {
     public long InvalidId { get; init; }
     
-    protected ArticleNotFoundException(string? message, long invalidId, EntityNotFoundException? innerException) : base(message, innerException)
+    public ArticleNotFoundException(string? message, long invalidId, EntityNotFoundException? innerException) : base(message, innerException)
     {
         InvalidId = invalidId;
     }
