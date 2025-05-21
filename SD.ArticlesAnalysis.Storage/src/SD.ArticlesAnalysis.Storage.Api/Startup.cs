@@ -1,4 +1,8 @@
 using System.Text.Json;
+using SD.ArticlesAnalysis.Storage.Api.Extensions;
+using SD.ArticlesAnalysis.Storage.Api.Filters;
+using SD.ArticlesAnalysis.Storage.Api.MiddleWare;
+using SD.ArticlesAnalysis.Storage.Domain.DependencyInjection.Extensions;
 
 namespace SD.ArticlesAnalysis.Storage.Api;
 
@@ -16,6 +20,8 @@ internal class Startup
     public void ConfigureServices(IServiceCollection services)
     {
         services
+            .AddGlobalFilters()
+            .AddDomainServices()
             .AddControllers()
             .AddJsonOptions(options =>
             {
@@ -23,7 +29,7 @@ internal class Startup
             })
             .AddMvcOptions(o =>
             {
-                // o.Filters.Add<ExceptionFilter>();
+                o.Filters.Add<ExceptionFilter>();
             });
     }
 
@@ -31,6 +37,8 @@ internal class Startup
     {
         app.UsePathBase("/api/storage");
         app.UseRouting();
+
+        app.UseMiddleware<LoggingMiddleware>();
 
         app.UseEndpoints(builder =>
         {
