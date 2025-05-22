@@ -7,7 +7,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Folder Include="Controllers\" />
+      <ProjectReference Include="..\SD.ArticlesAnalysis.Analysis.Domain\SD.ArticlesAnalysis.Analysis.Domain.csproj" />
+      <ProjectReference Include="..\SD.ArticlesAnalysis.Analysis.Infrastructure\SD.ArticlesAnalysis.Analysis.Infrastructure.csproj" />
     </ItemGroup>
 
 </Project>

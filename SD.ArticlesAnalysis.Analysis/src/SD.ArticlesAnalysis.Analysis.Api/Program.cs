@@ -1,26 +1,23 @@
+using System.Net;
+
 namespace SD.ArticlesAnalysis.Analysis.Api;
 
-public class Program
+public sealed class Program
 {
-    public static void Main(string[] args)
+    public static async Task Main()
     {
-        var builder = WebApplication.CreateBuilder(args);
+        var hostBuilder = Host.CreateDefaultBuilder()
+            .ConfigureWebHostDefaults(webBuilder => webBuilder.UseStartup<Startup>())
+            .ConfigureWebHost(webBuilder =>
+            {
+                webBuilder.ConfigureKestrel((context, serverOptions) =>
+                {
+                    serverOptions.Listen(IPAddress.Any, 8080);
+                });
+            });
 
-        // Add services to the container.
-
-        builder.Services.AddControllers();
-
-        var app = builder.Build();
-
-        // Configure the HTTP request pipeline.
-
-        app.UseHttpsRedirection();
-
-        app.UseAuthorization();
-
-
-        app.MapControllers();
-
-        app.Run();
+        await hostBuilder
+            .Build()
+            .RunAsync();
     }
 }
