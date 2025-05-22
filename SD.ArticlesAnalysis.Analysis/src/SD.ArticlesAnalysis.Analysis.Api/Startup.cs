@@ -1,4 +1,7 @@
 using System.Text.Json;
+using SD.ArticlesAnalysis.Analysis.Api.Extensions;
+using SD.ArticlesAnalysis.Analysis.Api.Filters;
+using SD.ArticlesAnalysis.Analysis.Api.Middleware;
 
 namespace SD.ArticlesAnalysis.Analysis.Api;
 
@@ -16,6 +19,7 @@ internal sealed class Startup
     public void ConfigureServices(IServiceCollection services)
     {
         services
+            .AddGlobalFilters()
             .AddControllers()
             .AddJsonOptions(o =>
             {
@@ -23,14 +27,17 @@ internal sealed class Startup
             })
             .AddMvcOptions(o =>
             {
-                // o.Filters.Add<ExceptionFilter>();
+                o.Filters.Add<ExceptionFiler>();
             });
     }
 
     public void Configure(IApplicationBuilder app)
     {
+        app.UseMiddleware<TracingMiddleware>();
         app.UsePathBase("/api/analysis");
         app.UseRouting();
+
+        app.UseMiddleware<LoggingMiddleware>();
 
         app.UseEndpoints(builder =>
         {
