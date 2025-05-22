@@ -2,6 +2,8 @@ using System.Text.Json;
 using SD.ArticlesAnalysis.Analysis.Api.Extensions;
 using SD.ArticlesAnalysis.Analysis.Api.Filters;
 using SD.ArticlesAnalysis.Analysis.Api.Middleware;
+using SD.ArticlesAnalysis.Analysis.Domain.DependencyInjection.Extensions;
+using SD.ArticlesAnalysis.Analysis.Infrastructure.DependencyInjection.Extensions;
 
 namespace SD.ArticlesAnalysis.Analysis.Api;
 
@@ -20,6 +22,13 @@ internal sealed class Startup
     {
         services
             .AddGlobalFilters()
+            .AddDalInfrastructure
+            (
+                configuration: _configuration,
+                isDevelopment: _hostEnvironment.IsDevelopment()
+            )
+            .AddDalRepositories()
+            .AddDomainServices()
             .AddControllers()
             .AddJsonOptions(o =>
             {

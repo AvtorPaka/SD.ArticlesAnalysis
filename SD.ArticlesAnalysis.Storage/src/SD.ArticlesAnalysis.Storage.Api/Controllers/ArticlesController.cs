@@ -48,18 +48,10 @@ public class ArticlesController : ControllerBase
             cancellationToken: cancellationToken
         );
 
-        if (request.Download)
-        {
-            return File(
-                fileStream: downloadContainer.ArticleFileStream,
-                contentType: "application/octet-stream",
-                fileDownloadName: downloadContainer.DispositionFilename
-            );
-        }
-        
         return File(
             fileStream: downloadContainer.ArticleFileStream,
-            contentType: "application/octet-stream"
+            contentType: "application/octet-stream",
+            fileDownloadName: downloadContainer.DispositionFilename
         );
     }
 }

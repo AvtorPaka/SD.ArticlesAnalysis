@@ -22,6 +22,9 @@ public class ExceptionFiler : IExceptionFilter
 
         switch (context.Exception)
         {
+            
+            #region Client-side
+            
             case ArticleNotFoundException exception:
 
                 _logger.LogArticleNotFoundInStorage(
@@ -50,12 +53,16 @@ public class ExceptionFiler : IExceptionFilter
                 _logger.LogArticleWordCloudNotFound(
                     callId: callId,
                     curTime: DateTime.UtcNow,
-                    articleId: exception.ArticleId
+                    articleId: exception.ArticleId,
+                    invalidLocation: exception.InvalidPath
                 );
 
                 ErrorRequestHandler.HandleArticleWordCloudNotFoundError(context, exception);
                 break;
 
+
+            #region Server-side
+            
             case StorageServiceResponseException exception:
 
                 _logger.LogStorageServiceUnexpectedResponse(
@@ -70,7 +77,8 @@ public class ExceptionFiler : IExceptionFilter
                 ErrorRequestHandler.HandleInternalError(context);
                 break;
 
-
+            #endregion
+            
             case StorageServiceUnavailableException exception:
 
                 _logger.LogStorageServiceUnavailable(
@@ -115,6 +123,8 @@ public class ExceptionFiler : IExceptionFilter
 
                 ErrorRequestHandler.HandleInternalError(context);
                 break;
+            
+            #endregion
         }
     }
 }

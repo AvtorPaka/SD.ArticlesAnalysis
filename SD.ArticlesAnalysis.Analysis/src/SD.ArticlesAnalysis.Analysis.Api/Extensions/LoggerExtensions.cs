@@ -124,12 +124,13 @@ internal static partial class LoggerExtensions
         Level = LogLevel.Error,
         EventId = 4007,
         Message =
-            "[{CallId}] [{CurTime}] Word Cloud for article with id: {ArticleId} could not be found."
+            "[{CallId}] [{CurTime}] Word Cloud for article with id: {ArticleId} could not be found for location: {invalidLocation}."
     )]
     public static partial void LogArticleWordCloudNotFound(this ILogger logger,
         string callId,
         DateTime curTime,
-        long articleId
+        long articleId,
+        string? invalidLocation
     );
     
     #endregion
