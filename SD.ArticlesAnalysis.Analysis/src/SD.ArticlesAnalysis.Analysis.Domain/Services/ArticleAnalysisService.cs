@@ -1,5 +1,6 @@
 using SD.ArticlesAnalysis.Analysis.Domain.Containers;
 using SD.ArticlesAnalysis.Analysis.Domain.Contracts.Dal.Interfaces;
+using SD.ArticlesAnalysis.Analysis.Domain.Contracts.Isc.Interfaces;
 using SD.ArticlesAnalysis.Analysis.Domain.Exceptions.Domain.Articles;
 using SD.ArticlesAnalysis.Analysis.Domain.Exceptions.Infrastructure.Dal;
 using SD.ArticlesAnalysis.Analysis.Domain.Exceptions.Infrastructure.Isc.Storage;
@@ -12,11 +13,20 @@ public class ArticleAnalysisService : IArticleAnalysisService
 {
     private readonly IArticleAnalysisRepository _analysisRepository;
     private readonly IArticleWordCloudRepository _wordCloudRepository;
+    private readonly IArticleStorageServiceClient _storageServiceClient;
+    private readonly IWordCloudApiClient _wordCloudApiClient;
 
-    public ArticleAnalysisService(IArticleAnalysisRepository analysisRepository, IArticleWordCloudRepository wordCloudRepository)
+    public ArticleAnalysisService(
+        IArticleAnalysisRepository analysisRepository,
+        IArticleWordCloudRepository wordCloudRepository,
+        IArticleStorageServiceClient articleStorageServiceClient,
+        IWordCloudApiClient wordCloudApiClient
+        )
     {
         _analysisRepository = analysisRepository;
         _wordCloudRepository = wordCloudRepository;
+        _storageServiceClient = articleStorageServiceClient;
+        _wordCloudApiClient = wordCloudApiClient;
     }
     
     public async Task<ArticleAnalysisModel> AnalyzeArticle(long articleId, CancellationToken cancellationToken)

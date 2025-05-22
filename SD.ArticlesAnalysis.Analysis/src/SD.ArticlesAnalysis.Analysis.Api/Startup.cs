@@ -28,6 +28,14 @@ internal sealed class Startup
                 isDevelopment: _hostEnvironment.IsDevelopment()
             )
             .AddDalRepositories()
+            .AddStorageServiceClient
+            (
+                configuration: _configuration,
+                isDevelopment: _hostEnvironment.IsDevelopment()
+            )
+            .AddWordCloudApiClient(
+                configuration: _configuration
+            )
             .AddDomainServices()
             .AddControllers()
             .AddJsonOptions(o =>
