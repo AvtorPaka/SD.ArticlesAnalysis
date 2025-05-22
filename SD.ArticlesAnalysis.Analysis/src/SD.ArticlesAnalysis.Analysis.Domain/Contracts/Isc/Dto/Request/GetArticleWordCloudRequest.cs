@@ -6,5 +6,5 @@ public record GetArticleWordCloudRequest(
     int Width,
     int Height,
     string FontFamily,
-    string FontScale
+    int FontScale
 );

@@ -39,7 +39,7 @@ INSERT INTO articles_analysis (article_id, article_name, paragraphs_count, words
         return createdIds.ToArray();
     }
 
-    public async Task<ArticleAnalysisEntity> GetByArticleId(long articleId, CancellationToken cancellationToken)
+    public async Task<ArticleAnalysisEntity?> GetByArticleId(long articleId, CancellationToken cancellationToken)
     {
         const string sqlQuery = @"
 SELECT * FROM articles_analysis
@@ -61,13 +61,6 @@ SELECT * FROM articles_analysis
             )
         );
 
-        var entity = entities.FirstOrDefault();
-
-        if (entity == null)
-        {
-            throw new EntityNotFoundException("Article analysis could not be found");
-        }
-
-        return entity;
+        return  entities.FirstOrDefault();
     }
 }

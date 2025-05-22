@@ -32,11 +32,12 @@ public class ArticlesAnalysisController : ControllerBase
         );
 
         return Ok(new GetArticleAnalysisResponse(
+            Id: model.Id,
             ArticleId: model.ArticleId,
             ArticleName: model.ArticleName,
-            Paragraphs: model.ParagraphsCount,
-            Words: model.WordsCount,
-            Characters: model.CharactersCount
+            Paragraphs: model.TextAnalysis.ParagraphsCount,
+            Words: model.TextAnalysis.WordsCount,
+            Characters: model.TextAnalysis.CharactersCount
         ));
     }
 

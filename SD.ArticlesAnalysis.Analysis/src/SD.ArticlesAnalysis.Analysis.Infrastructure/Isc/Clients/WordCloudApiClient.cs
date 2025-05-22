@@ -1,3 +1,5 @@
+using System.Net.Http.Json;
+using System.Text.Json;
 using SD.ArticlesAnalysis.Analysis.Domain.Contracts.Isc.Dto.Request;
 using SD.ArticlesAnalysis.Analysis.Domain.Contracts.Isc.Interfaces;
 using SD.ArticlesAnalysis.Analysis.Domain.Exceptions.Infrastructure.Isc.WordCloud;
@@ -22,9 +24,9 @@ public class WordCloudApiClient : IWordCloudApiClient
         HttpResponseMessage response;
         try
         {
-            response = await client.GetAsync(
-                requestUri:
-                $"/wordcloud?text{request.Text}&format={request.Format}&width={request.Width}&height={request.Height}&fontFamily={request.FontFamily}&fontScale={request.FontScale}",
+            response = await client.PostAsJsonAsync(
+                requestUri: "/wordcloud",
+                value: request,
                 cancellationToken: cancellationToken
             );
         }

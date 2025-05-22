@@ -4,8 +4,6 @@ public record ArticleAnalysisModel(
     long Id,
     long ArticleId,
     string ArticleName,
-    long ParagraphsCount,
-    long WordsCount,
-    long CharactersCount,
-    string WordCloudLocation
+    string WordCloudLocation,
+    ArticleTextAnalysisModel TextAnalysis
 );

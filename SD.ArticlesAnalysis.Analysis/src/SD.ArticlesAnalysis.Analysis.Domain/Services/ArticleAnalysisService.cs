@@ -1,5 +1,9 @@
+using System.Text.RegularExpressions;
 using SD.ArticlesAnalysis.Analysis.Domain.Containers;
+using SD.ArticlesAnalysis.Analysis.Domain.Contracts.Dal.Entities;
 using SD.ArticlesAnalysis.Analysis.Domain.Contracts.Dal.Interfaces;
+using SD.ArticlesAnalysis.Analysis.Domain.Contracts.Isc.Dto.Request;
+using SD.ArticlesAnalysis.Analysis.Domain.Contracts.Isc.Dto.Responses;
 using SD.ArticlesAnalysis.Analysis.Domain.Contracts.Isc.Interfaces;
 using SD.ArticlesAnalysis.Analysis.Domain.Exceptions.Domain.Articles;
 using SD.ArticlesAnalysis.Analysis.Domain.Exceptions.Infrastructure.Dal;
@@ -21,14 +25,14 @@ public class ArticleAnalysisService : IArticleAnalysisService
         IArticleWordCloudRepository wordCloudRepository,
         IArticleStorageServiceClient articleStorageServiceClient,
         IWordCloudApiClient wordCloudApiClient
-        )
+    )
     {
         _analysisRepository = analysisRepository;
         _wordCloudRepository = wordCloudRepository;
         _storageServiceClient = articleStorageServiceClient;
         _wordCloudApiClient = wordCloudApiClient;
     }
-    
+
     public async Task<ArticleAnalysisModel> AnalyzeArticle(long articleId, CancellationToken cancellationToken)
     {
         try
@@ -47,11 +51,108 @@ public class ArticleAnalysisService : IArticleAnalysisService
 
     private async Task<ArticleAnalysisModel> AnalyzeArticleUnsafe(long articleId, CancellationToken cancellationToken)
     {
-        await Task.Delay(TimeSpan.FromMicroseconds(1), cancellationToken);
-        throw new NotImplementedException();
+        using var transaction = _analysisRepository.CreateTransactionScope();
+
+        ArticleAnalysisEntity? existingAnalysis = await _analysisRepository.GetByArticleId(
+            articleId: articleId,
+            cancellationToken: cancellationToken
+        );
+
+        ArticleAnalysisModel analysisModel;
+        if (existingAnalysis != null)
+        {
+            analysisModel = new ArticleAnalysisModel(
+                Id: existingAnalysis.Id,
+                ArticleId: existingAnalysis.ArticleId,
+                ArticleName: existingAnalysis.ArticleName,
+                TextAnalysis: new ArticleTextAnalysisModel(
+                    ParagraphsCount: existingAnalysis.ParagraphsCount,
+                    WordsCount: existingAnalysis.WordsCount,
+                    CharactersCount: existingAnalysis.CharactersCount
+                ),
+                WordCloudLocation: existingAnalysis.WordCloudLocation
+            );
+        }
+        else
+        {
+            GetArticleDataResponse articleData = await _storageServiceClient.GetArticleData(
+                articleId: articleId,
+                cancellationToken: cancellationToken
+            );
+
+            string wordCloudUniqueName = $"{articleId}_wc_{articleData.ArticleName}.png";
+
+            await using Stream wordCloudImageStream = await _wordCloudApiClient.GetArticleWordCloudImage(
+                request: new GetArticleWordCloudRequest(
+                    Text: articleData.ArticleData,
+                    Format: "png",
+                    Width: 600,
+                    Height: 600,
+                    FontFamily: "sans-serif",
+                    FontScale: 20
+                ),
+                cancellationToken: cancellationToken
+            );
+
+            string articleWordCloudLocationPath = await _wordCloudRepository.UploadWordCloudImage(
+                wordCloudImageStream: wordCloudImageStream,
+                wordCloudUniqueName: wordCloudUniqueName,
+                cancellationToken: cancellationToken
+            );
+
+            ArticleTextAnalysisModel textAnalysis = ProcessArticleText(articleData.ArticleData);
+
+            var createdIds = await _analysisRepository.Add(
+                entities:
+                [
+                    new ArticleAnalysisEntity
+                    {
+                        ArticleId = articleId,
+                        ArticleName = articleData.ArticleName,
+                        CharactersCount = textAnalysis.CharactersCount,
+                        ParagraphsCount = textAnalysis.ParagraphsCount,
+                        WordsCount = textAnalysis.WordsCount,
+                        WordCloudLocation = articleWordCloudLocationPath
+                    }
+                ],
+                cancellationToken: cancellationToken
+            );
+
+            long createdId = createdIds.Length == 0 ? -1 : createdIds[0];
+
+            analysisModel = new ArticleAnalysisModel(
+                Id: createdId,
+                ArticleId: articleId,
+                ArticleName: articleData.ArticleName,
+                WordCloudLocation: articleWordCloudLocationPath,
+                TextAnalysis: textAnalysis
+            );
+        }
+
+
+        transaction.Complete();
+        return analysisModel;
     }
 
-    public async Task<DownloadArticleWordCloudContainer> DownloadWordCloudImage(long articleId, CancellationToken cancellationToken)
+    private ArticleTextAnalysisModel ProcessArticleText(string articleText)
+    {
+        long paragraphs = articleText.Split(["\r\n", "\r", "\n"], StringSplitOptions.RemoveEmptyEntries)
+            .Count(p => !string.IsNullOrWhiteSpace(p));
+        
+        long words = Regex.Split(articleText, @"\W+")
+            .Count(w => !string.IsNullOrWhiteSpace(w));;
+
+        long characters = articleText.Count(c => !char.IsWhiteSpace(c));
+
+        return new ArticleTextAnalysisModel(
+            ParagraphsCount: paragraphs,
+            WordsCount: words,
+            CharactersCount: characters
+        );
+    }
+
+    public async Task<DownloadArticleWordCloudContainer> DownloadWordCloudImage(long articleId,
+        CancellationToken cancellationToken)
     {
         try
         {
@@ -76,9 +177,31 @@ public class ArticleAnalysisService : IArticleAnalysisService
         }
     }
 
-    private async Task<DownloadArticleWordCloudContainer> DownloadWordCloudImageUnsafe(long articleId, CancellationToken cancellationToken)
+    private async Task<DownloadArticleWordCloudContainer> DownloadWordCloudImageUnsafe(long articleId,
+        CancellationToken cancellationToken)
     {
-        await Task.Delay(TimeSpan.FromMicroseconds(1), cancellationToken);
-        throw new NotImplementedException();
+        using var transaction = _analysisRepository.CreateTransactionScope();
+
+        ArticleAnalysisEntity? entity = await _analysisRepository.GetByArticleId(
+            articleId: articleId,
+            cancellationToken: cancellationToken
+        );
+
+        if (entity == null)
+        {
+            throw new EntityNotFoundException("Article analysis could not be found");
+        }
+
+        transaction.Complete();
+
+        Stream wordCloudImageStream = await _wordCloudRepository.GetWordCloudImageFileStream(
+            wordCloudImagePath: entity.WordCloudLocation,
+            cancellationToken: cancellationToken
+        );
+
+        return new DownloadArticleWordCloudContainer(
+            WordCloudFileStream: wordCloudImageStream,
+            DispositionFilename: $"{entity.ArticleName}_word_cloud.png"
+        );
     }
 }
