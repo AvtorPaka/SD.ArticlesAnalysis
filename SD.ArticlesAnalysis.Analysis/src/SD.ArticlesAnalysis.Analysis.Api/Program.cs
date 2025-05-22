@@ -12,7 +12,7 @@ public sealed class Program
             {
                 webBuilder.ConfigureKestrel((context, serverOptions) =>
                 {
-                    serverOptions.Listen(IPAddress.Any, 8080);
+                    serverOptions.Listen(IPAddress.Any, 7077);
                 });
             });
 
