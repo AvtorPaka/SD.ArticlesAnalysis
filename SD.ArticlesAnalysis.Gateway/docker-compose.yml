@@ -1,0 +1,16 @@
+services:
+  sd_aa_api_gateway:
+    image: nginx:1.28-alpine
+    volumes:
+      - ./nginx.conf.template:/etc/nginx/templates/default.conf.template
+    environment:
+      - ANALYSIS_API_URL=${SD_AA_A_URL}
+      - STORAGE_API_URL=${SD_AA_S_URL}
+    ports:
+      - ${SD_AA_GATEWAY_PORT}:80
+    networks:
+      - sd-aa-gateway-network
+
+networks:
+  sd-aa-gateway-network:
+    driver: bridge
