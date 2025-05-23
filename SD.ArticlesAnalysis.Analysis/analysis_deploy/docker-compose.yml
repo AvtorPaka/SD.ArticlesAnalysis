@@ -1,0 +1,50 @@
+services:
+  sd_aa_analysis_api:
+    build:
+      context: ./../
+      dockerfile: Dockerfile
+      args:
+        TARGETARCH: ${BUILD_ARCH}
+    platform: ${BUILD_PLATFORM}
+    container_name: sd-aa-analysis
+    image: sd.aa.analysis:1.0
+    restart: always
+    env_file:
+      - ./.env
+    environment:
+      - DOTNET_EnableWriteXorExecute=0
+      - DOTNET_NUGET_SIGNATURE_VERIFICATION=false
+    networks:
+      - sd-aa-a-network
+    volumes:
+      - sd-aa-analysis-data:/wordcloud_data
+    ports:
+      - ${SD_AA_ANALYSIS_API_PORT}:7077
+    depends_on:
+      - sd_aa_analysis_db
+  
+  sd_aa_analysis_db:
+    image: postgres:latest
+    container_name: sd-aa-a-pg
+    restart: always
+    shm_size: 128mb
+    env_file:
+      - ./.env
+    environment:
+      POSTGRES_DB: ${PG_DB}
+      POSTGRES_USER: ${PG_USER}
+      POSTGRES_PASSWORD: ${PG_PSWD}
+    volumes:
+      - sd-aa-a-pg-data:/var/lib/postgresql/data
+    networks:
+      - sd-aa-a-network
+
+volumes:
+  sd-aa-a-pg-data:
+    driver: local
+  sd-aa-analysis-data:
+    driver: local
+
+networks:
+  sd-aa-a-network:
+    driver: bridge

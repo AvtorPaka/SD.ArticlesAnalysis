@@ -1,0 +1,51 @@
+services:
+  sd_aa_storage_api:
+    build:
+      context: ./../
+      dockerfile: Dockerfile
+      args:
+        TARGETARCH: ${BUILD_ARCH}
+    platform: ${BUILD_PLATFORM}
+    container_name: sd-aa-storage
+    image: sd.aa.storage:1.0
+    restart: always
+    env_file:
+      - ./.env
+    environment:
+      - DOTNET_EnableWriteXorExecute=0
+      - DOTNET_NUGET_SIGNATURE_VERIFICATION=false
+    networks:
+      - sd-aa-s-network
+    volumes:
+      - sd-aa-storage-data:/file_data
+    ports:
+      - ${SD_AA_STORAGE_API_PORT}:7070
+    depends_on:
+      - sd_aa_storage_db
+  
+  sd_aa_storage_db:
+    image: postgres:latest
+    container_name: sd-aa-s-pg
+    restart: always
+    shm_size: 128mb
+    env_file:
+      - ./.env
+    environment:
+      POSTGRES_DB: ${PG_DB}
+      POSTGRES_USER: ${PG_USER}
+      POSTGRES_PASSWORD: ${PG_PSWD}
+    volumes:
+      - sd-aa-s-pg-data:/var/lib/postgresql/data
+    networks:
+      - sd-aa-s-network
+
+
+volumes:
+  sd-aa-s-pg-data:
+    driver: local
+  sd-aa-storage-data:
+    driver: local
+
+networks:
+  sd-aa-s-network:
+    driver: bridge
